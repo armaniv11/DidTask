@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -36,15 +37,19 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
     Widget title = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset('assets/icons/mainlogo.png'),
+        Image.asset(
+          'assets/icons/mainlogo.png',
+          height: size.height / 4,
+          width: size.width / 2,
+        ),
         Center(
           child: Text('Welcome To',
-              style: GoogleFonts.pacifico(color: Colors.white, fontSize: 24)),
+              style: GoogleFonts.pacifico(color: Colors.grey, fontSize: 24)),
         ),
         Text(
           AppConstants.appName,
           style: TextStyle(
-              color: Colors.white,
+              color: Colors.grey,
               fontSize: 44.0,
               fontWeight: FontWeight.bold,
               letterSpacing: 4,
@@ -58,18 +63,6 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
         ),
       ],
     );
-
-    Widget subTitle() {
-      return Container(
-        width: size.width,
-        height: size.height / 2.2,
-        // decoration: const BoxDecoration(
-        //     // color: Colors.yellow,
-        //     image: DecorationImage(
-        //         image: AssetImage('assets/images/login.png'),
-        //         fit: BoxFit.fill)),
-      );
-    }
 
     Widget registerButton = InkWell(
       onTap: () async {
@@ -88,7 +81,7 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
                   )));
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
         child: PhysicalModel(
           color: Colors.black,
           borderRadius: BorderRadius.circular(9),
@@ -96,7 +89,7 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
           child: Container(
             padding: EdgeInsets.all(16),
             // width: MediaQuery.of(context).size.width / 2,
-            // height: 80,
+            height: 60,
             child: Center(
                 child: new Text("Confirm",
                     style: const TextStyle(
@@ -108,10 +101,10 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
                 gradient: LinearGradient(
                     colors: [
                       Colors.orange[600]!,
-                      Colors.orange,
+                      Colors.orange[900]!,
                     ],
-                    begin: FractionalOffset.topLeft,
-                    end: FractionalOffset.bottomRight),
+                    begin: FractionalOffset.topCenter,
+                    end: FractionalOffset.bottomCenter),
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(0, 0, 0, 0.16),
@@ -126,97 +119,89 @@ class _RegisterPagePhoneState extends State<RegisterPagePhone> {
     );
 
     Widget registerForm() {
-      return Row(
-        children: [
-          Container(
-              width: 80,
-              decoration: BoxDecoration(
-                color: Colors.grey[50]!.withOpacity(0.7),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  "+91",
-                  style: TextStyle(
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                Container(
+                    width: 80,
+                    decoration: BoxDecoration(
+                      // color: Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          bottomLeft: Radius.circular(8)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        "+91",
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 3),
+                      ),
+                    )),
+                Expanded(
+                  child: TextField(
+                    controller: mobController,
+                    keyboardType: TextInputType.phone,
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 3),
-                ),
-              )),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50]!.withOpacity(0.7),
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8),
-                    bottomRight: Radius.circular(8)),
-              ),
-              child: TextField(
-                controller: mobController,
-                keyboardType: TextInputType.phone,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 4,
-                ),
-                decoration: InputDecoration(
-                  hintStyle: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
+                      letterSpacing: 4,
+                    ),
+                    decoration: InputDecoration(
+                      // fillColor: Colors.white,
+                      // filled: true,
+                      hintStyle: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                      hintText: 'Mobile Number',
+                      // prefixIcon: Icon(Icons.phone),
+                      border: InputBorder.none,
+                      contentPadding:
+                          EdgeInsets.only(right: 20, top: 20, bottom: 20),
+                    ),
                   ),
-                  hintText: 'Mobile Number',
-                  // prefixIcon: Icon(Icons.phone),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.only(right: 20, top: 20, bottom: 20),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       );
     }
 
     return Scaffold(
-      // resizeToAvoidBottomInset: true,
+      // backgroundColor: Colors.yellow,
+      // resizeToAvoidBottomInset: false,
       body: Stack(
         children: <Widget>[
-          // Container(
-          //   decoration: const BoxDecoration(
-          //       image: DecorationImage(
-          //           image: AssetImage('assets/images/bg.png'),
-          //           fit: BoxFit.cover)),
-          // ),
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    end: Alignment.topRight,
-                    begin: Alignment.bottomLeft,
-                    colors: [
-                  Colors.blue[800]!.withOpacity(0.5),
-                  Colors.blue[400]!.withOpacity(0.5)
-                ])),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  title,
-
-                  registerForm(),
-                  registerButton,
-
-                  // Spacer(),
-                  subTitle(),
-                ],
-              ),
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisAlignment: MainAxisAlignment.s
+              children: <Widget>[
+                SizedBox(
+                  height: size.height * 0.1,
+                ),
+                title,
+                SizedBox(
+                  height: size.height * 0.05,
+                ),
+                registerForm(),
+                registerButton,
+                SizedBox(
+                  height: size.height * 0.2,
+                ),
+              ],
             ),
           ),
         ],

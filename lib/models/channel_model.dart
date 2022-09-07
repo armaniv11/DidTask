@@ -8,7 +8,7 @@ class ChannelModel {
   String channelId;
   String adminId;
   bool isPrivate;
-  String? lastMsg;
+  int memberCount;
   int createdAt;
   int? updatedAt;
 
@@ -16,7 +16,7 @@ class ChannelModel {
       {required this.channelName,
       required this.channelId,
       required this.adminId,
-      this.lastMsg = '',
+      this.memberCount = 0,
       this.isPrivate = false,
       required this.createdAt,
       this.updatedAt});

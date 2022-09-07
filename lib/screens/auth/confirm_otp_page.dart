@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:did/screens/channel_homepage.dart';
-import 'package:did/screens/homepage.dart';
 import 'package:did/screens/users/add_update_users.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:lottie/lottie.dart';
 
 class ConfirmOtpPage extends StatefulWidget {
   final String? phoneNo;
@@ -15,26 +20,24 @@ class ConfirmOtpPage extends StatefulWidget {
 }
 
 class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
-  // TextEditingController otp1 = TextEditingController(text: '1');
-  // TextEditingController otp2 = TextEditingController(text: '2');
-  // TextEditingController otp3 = TextEditingController(text: '3');
-  // TextEditingController otp4 = TextEditingController(text: '4');
-  // TextEditingController otp5 = TextEditingController(text: '5');
   Color accentPurpleColor = const Color(0xFF6A53A1);
-  Color primaryColor = Color(0xFF121212);
-  Color accentPinkColor = Color(0xFFF99BBD);
-  Color accentDarkGreenColor = Colors.white;
-  Color accentYellowColor = Color(0xFFFFB612);
-  Color accentOrangeColor = Color(0xFFEA7A3B);
+  Color deepOrange = Colors.deepOrange;
+  Color primaryColor = const Color(0xFF121212);
+  Color accentPinkColor = const Color(0xFFF99BBD);
+  Color accentDarkGreenColor = Colors.grey;
+  Color accentYellowColor = const Color(0xFFFFB612);
+  Color accentOrangeColor = const Color(0xFFEA7A3B);
   late List<TextStyle> otpTextStyles;
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
   late String verificationId;
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String smscode = "";
   bool isLoading = false;
+
+  int resendClicked = 0;
 
   TextStyle createStyle(Color color) {
     ThemeData theme = Theme.of(context);
@@ -44,7 +47,9 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
   Future<void> verifyPhone(phoneNo) async {
     setState(() {
       isLoading = true;
+      _counter = 30;
     });
+
     await _auth.verifyPhoneNumber(
         phoneNumber: phoneNo,
         verificationCompleted: (phoneAuthCredential) async {
@@ -56,7 +61,9 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
           setState(() {
             isLoading = false;
           });
-          print("failed");
+          if (kDebugMode) {
+            print("failed");
+          }
         },
         codeSent: (verificationId, resendingToken) async {
           setState(() {
@@ -68,44 +75,25 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
         codeAutoRetrievalTimeout: (verificationId) async {});
   }
 
-  // DatabaseService databaseService = DatabaseService();
-
   void signInWithPhoneAuthCredential(
       PhoneAuthCredential phoneAuthCredential) async {
     setState(() {
       isLoading = true;
     });
-    print(widget.phoneNo);
 
-    final dynamic authCredential = await _auth
-        .signInWithCredential(phoneAuthCredential)
-        .then((value) async {
+    await _auth.signInWithCredential(phoneAuthCredential).then((value) async {
       final FirebaseAuth _auth = FirebaseAuth.instance;
       final User user = _auth.currentUser!;
-      print(user.uid);
-      print("checking");
       GetStorage().write('isloggedIn', true);
+      print("${GetStorage().read('isloggedIn')} this is the confirm page");
       GetStorage().write('userid', user.uid);
       GetStorage().write('mob', widget.phoneNo);
-      await checkAccountExists(widget.phoneNo);
-
-      // await databaseService.createProfile(widget.phoneNo).then((value) {
-      // Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => AddCompany(
-      //               mob: widget.phoneNo,
-      //             )));
-      // });
-
-      // HelperFunctions.saveUserLoggedInStatus(
-      //     isLoggedIn: true, userid: user.uid);
+      await checkAccountExists(user.uid);
     });
 
     setState(() {
       isLoading = false;
     });
-    print("verifying");
   }
 
   checkAccountExists(mob) async {
@@ -117,6 +105,8 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const AddUpdateUser()));
       }
+      //   Navigator.pushReplacement(
+      //       context, MaterialPageRoute(builder: (context) => Home()));
     });
   }
 
@@ -125,23 +115,44 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
   void initState() {
     verifyPhone('+91${widget.phoneNo}');
     super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _timer.cancel();
+  }
+
+  int _counter = 30;
+  late Timer _timer;
+
+  void _startTimer() {
+    _counter = 60;
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _counter--;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     otpTextStyles = [
-      createStyle(accentPurpleColor),
+      createStyle(deepOrange),
       createStyle(accentYellowColor),
       createStyle(accentDarkGreenColor),
       createStyle(accentOrangeColor),
       createStyle(accentPinkColor),
-      createStyle(Colors.cyan),
+      createStyle(deepOrange),
     ];
     Widget title = const Center(
       child: Text(
         'Confirm your OTP',
         style: TextStyle(
-          color: Colors.white,
+          color: Colors.black,
           fontSize: 26.0,
           fontWeight: FontWeight.bold,
           shadows: [
@@ -153,6 +164,23 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
           ],
         ),
       ),
+    );
+
+    Widget subTitle = Text(
+      'Enter the Verification Code we just sent you on your Phone',
+      style: TextStyle(
+        color: Colors.grey[900]!,
+        fontSize: 20.0,
+        fontWeight: FontWeight.bold,
+        shadows: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.15),
+            offset: Offset(0, 5),
+            blurRadius: 10.0,
+          )
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
 
     // Widget subTitle = Padding(
@@ -172,13 +200,15 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
               PhoneAuthProvider.credential(
                   verificationId: verificationId, smsCode: smscode);
           signInWithPhoneAuthCredential(phoneAuthCredential);
+          // Navigator.of(context)
+          //     .push(MaterialPageRoute(builder: (_) => IntstartroPage()));
         },
         child: Container(
-          width: MediaQuery.of(context).size.width / 2,
+          width: MediaQuery.of(context).size.width / 1.4,
           height: 60,
           child: const Center(
             child: Text(
-              "Verify",
+              "Verify and Proceed",
               style: TextStyle(
                   color: Color(0xfffefefe),
                   fontWeight: FontWeight.w600,
@@ -190,7 +220,7 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
               gradient: LinearGradient(
                   colors: [
                     Colors.orange[600]!,
-                    Colors.orange,
+                    Colors.orange[900]!,
                   ],
                   begin: FractionalOffset.topCenter,
                   end: FractionalOffset.bottomCenter),
@@ -208,21 +238,24 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
 
     Widget resendText = Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const Text(
+        Text(
           "Resend again after ",
           style: TextStyle(
             fontStyle: FontStyle.italic,
-            color: Color.fromRGBO(255, 255, 255, 0.5),
+            color: Colors.blue[900]!,
             fontSize: 14.0,
           ),
         ),
         InkWell(
-          onTap: () {},
-          child: const Text(
-            '0:39',
+          onTap: () {
+            verifyPhone('+91${widget.phoneNo}');
+          },
+          child: Text(
+            _counter > 60 ? "Resend" : '$_counter',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 14.0,
             ),
@@ -234,29 +267,48 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
-        backgroundColor: Colors.indigo,
+        // backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Colors.transparent,
           elevation: 0.0,
+          centerTitle: true,
+          title: Text(
+            'Confirm OTP',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 26.0,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.15),
+                  offset: Offset(0, 5),
+                  blurRadius: 10.0,
+                )
+              ],
+            ),
+          ),
         ),
         body: isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(
-                color: Colors.pinkAccent,
+                color: Colors.blue[900],
               ))
-            : Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 28.0),
-                    child: Column(
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        const Spacer(flex: 3),
-                        title,
-                        const Spacer(),
-                        // subTitle,
-                        const Spacer(flex: 1),
-
+                        Center(
+                          child: Lottie.asset('assets/lotties/otp.json',
+                              height: size.height * 0.4,
+                              width: size.width * 0.7),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: subTitle,
+                        ),
                         OtpTextField(
                           numberOfFields: 6,
                           borderColor: accentPurpleColor,
@@ -272,21 +324,37 @@ class _ConfirmOtpPageState extends State<ConfirmOtpPage> {
                             print("smscode is : $smscode");
                           },
                         ),
-                        const Spacer(flex: 1),
-//                      otpCode,
                         Padding(
-                          padding: const EdgeInsets.only(right: 28.0),
+                          padding: const EdgeInsets.only(top: 20, bottom: 10),
                           child: verifyButton,
                         ),
-                        const Spacer(flex: 2),
-                        resendText,
-                        const Spacer()
+                        resendText
                       ],
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
       ),
     );
+  }
+
+  void signInAnonymously() async {
+    setState(() {
+      isLoading = true;
+    });
+    _auth.signInAnonymously().then((result) async {
+      // setState(() {
+      final User? user = result.user;
+      // });
+      GetStorage().write('isloggedIn', true);
+      print("${GetStorage().read('isloggedIn')} this is the confirm page");
+
+      GetStorage().write('userid', user!.uid);
+      GetStorage().write('mob', widget.phoneNo);
+      await checkAccountExists(user.uid);
+      setState(() {
+        isLoading = true;
+      });
+    });
   }
 }

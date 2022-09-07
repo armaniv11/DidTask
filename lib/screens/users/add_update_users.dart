@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:did/appConstants.dart';
 import 'package:did/custom_classes/custom_button.dart';
 import 'package:did/custom_classes/custom_textfield.dart';
 import 'package:did/models/user_model.dart';
@@ -43,49 +44,68 @@ class _AddUpdateUserState extends State<AddUpdateUser> {
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
-        backgroundColor: Colors.cyan,
+        backgroundColor: AppConstants.appBackGroundColor,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           elevation: 0,
-          backgroundColor: Colors.cyan,
+          backgroundColor: AppConstants.appBackGroundColor,
           // shadowColor: Colors.yellow,
           title: Text("Profile"),
           centerTitle: true,
         ),
         body: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              CustomTextField(
-                controller: phoneController,
-                width: double.maxFinite,
-                inputType: TextInputType.phone,
-                headingColor: Colors.black,
-                headingSize: 16,
-                hintText: "Mobile Number",
-                enabled: false,
-              ),
-              CustomTextField(
-                controller: whatsappController,
-                width: double.maxFinite,
-                inputType: TextInputType.phone,
-                headingColor: Colors.black,
-                headingSize: 16,
-                hintText: "Whatsapp Number",
-              ),
-              CustomTextField(
-                controller: nameController,
-                width: double.maxFinite,
-                inputType: TextInputType.name,
-                headingColor: Colors.black,
-                headingSize: 16,
-                validationEnabled: true,
-                hintText: "Full Name",
-              ),
-              Spacer(),
-              InkWell(
-                  onTap: saveProfile,
-                  child: const CustomButton(buttonText: "Save"))
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 100,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomTextField(
+                    fillColor: AppConstants.appBackGroundColor,
+                    controller: phoneController,
+                    width: double.maxFinite,
+                    inputType: TextInputType.phone,
+                    headingColor: Colors.black,
+                    headingSize: 16,
+                    hintText: "Mobile Number",
+                    enabled: false,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomTextField(
+                    fillColor: AppConstants.appBackGroundColor,
+                    controller: whatsappController,
+                    width: double.maxFinite,
+                    inputType: TextInputType.phone,
+                    headingColor: Colors.black,
+                    headingSize: 16,
+                    hintText: "Whatsapp Number",
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomTextField(
+                    fillColor: AppConstants.appBackGroundColor,
+                    controller: nameController,
+                    width: double.maxFinite,
+                    inputType: TextInputType.name,
+                    headingColor: Colors.black,
+                    headingSize: 16,
+                    validationEnabled: true,
+                    hintText: "Full Name",
+                  ),
+                ),
+                // Spacer(),
+                InkWell(
+                    onTap: saveProfile,
+                    child: CustomButton(
+                        bgColor: Colors.yellow[800], buttonText: "Save"))
+              ],
+            ),
           ),
         ),
       ),
